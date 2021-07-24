@@ -10,8 +10,7 @@ namespace MultiplayerMod.Networking
         public bool IsConnected => IsValid;
         internal bool IsValid { get; private set; } = true;
 
-        internal DiscordTransportConnection(ulong id, P2PMessage initialMessage)
-        {
+        internal DiscordTransportConnection(ulong id, P2PMessage initialMessage) {
             var lobbyManager = discord.GetLobbyManager();
             lobbyManager.ConnectNetwork(id);
             // Reliable on 0, unreliable on 1
@@ -23,15 +22,13 @@ namespace MultiplayerMod.Networking
             MelonLogger.Msg($"Discord: Sent initial message to {id}");
         }
 
-        public void Disconnect()
-        {
+        public void Disconnect() {
             var lobbyManager = discord.GetLobbyManager();
             lobbyManager.DisconnectLobby(lobbyManager.GetLobbyId(0));
             IsValid = false;
         }
 
-        public void SendMessage(P2PMessage msg, SendReliability sendType)
-        {
+        public void SendMessage(P2PMessage msg, SendReliability sendType) {
             var lobbyManager = discord.GetLobbyManager();
             lobbyManager.SendNetworkMessage(lobbyManager.GetLobbyId(0), ConnectedTo, sendType, msg.GetBytes());
         }
@@ -42,10 +39,8 @@ namespace MultiplayerMod.Networking
         public event Action<ITransportConnection, P2PMessage> OnMessageReceived;
         private readonly Dictionary<ulong, DiscordTransportConnection> connections = new Dictionary<ulong, DiscordTransportConnection>();
 
-        public ITransportConnection ConnectTo(ulong id, P2PMessage initialMessage)
-        {
-            if (connections.ContainsKey(id))
-            {
+        public ITransportConnection ConnectTo(ulong id, P2PMessage initialMessage) {
+            if (connections.ContainsKey(id)) {
                 if (connections[id].IsValid)
                     throw new ArgumentException("Already connected to " + id.ToString());
                 else
@@ -61,18 +56,21 @@ namespace MultiplayerMod.Networking
             return connection;
         }
 
-        public void StartListening()
-        {
+        public void StartListening() {
             var lobbyManager = discord.GetLobbyManager();
             lobbyManager.OnNetworkMessage = (lobbyId, userId, channelId, data) => {
                 OnMessageReceived.Invoke(connections[userId], new P2PMessage(data));
             };
         }
 
-        public void StopListening()
-        {
+        public void StopListening() {
             var lobbyManager = discord.GetLobbyManager();
             lobbyManager.OnNetworkMessage = null;
+        }
+
+        public void Update() {
+            var lobbyManager = discord.GetLobbyManager();
+            lobbyManager.FlushNetwork();
         }
     }
 }
