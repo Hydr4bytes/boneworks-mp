@@ -40,7 +40,7 @@ namespace MultiplayerMod.Networking
     public class DiscordTransportLayer : ITransportLayer {
         public event Action<ITransportConnection, ConnectionClosedReason> OnConnectionClosed;
         public event Action<ITransportConnection, P2PMessage> OnMessageReceived;
-        private readonly Dictionary<ulong, SteamTransportConnection> connections = new Dictionary<ulong, SteamTransportConnection>();
+        private readonly Dictionary<ulong, DiscordTransportConnection> connections = new Dictionary<ulong, DiscordTransportConnection>();
 
         public ITransportConnection ConnectTo(ulong id, P2PMessage initialMessage)
         {
