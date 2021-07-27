@@ -43,7 +43,8 @@ namespace MultiplayerMod.Networking
         Death,
         ChangeObjectOwnership,
         SetLocalSmallId,
-        PoolSpawn
+        PoolSpawn,
+        Death
     }
 
     public interface INetworkMessage
@@ -934,6 +935,31 @@ namespace MultiplayerMod.Networking
             msg.WriteByte((byte)MessageType.PoolSpawn);
             msg.WriteVector3(position);
             msg.WriteQuaternion(rotation);
+
+            return msg;
+        }
+    }
+
+    public class DeathMessage : INetworkMessage
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+
+        public DeathMessage() { }
+
+        public DeathMessage(P2PMessage msg)
+        {
+            position = msg.ReadVector3();
+            rotation = msg.ReadSmallerCompressedQuaternion();
+        }
+
+        public P2PMessage MakeMsg()
+        {
+            P2PMessage msg = new P2PMessage();
+
+            msg.WriteByte((byte)MessageType.PoolSpawn);
+            msg.WriteVector3(position);
+            msg.WriteSmallerCompressedQuaternion(rotation);
 
             return msg;
         }
